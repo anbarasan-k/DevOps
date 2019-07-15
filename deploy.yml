@@ -1,0 +1,10 @@
+- name: Deployment playbook for WebApplication with HTTPS support
+  hosts: all
+  become: yes
+  become_method: sudo
+  remote_user: vagrant
+  environment:
+    JAVA_HOME: '/usr/lib/jvm/default-java' 
+    CATALINA_HOME: '/usr/share/tomcat/'
+  roles:
+    - webapp

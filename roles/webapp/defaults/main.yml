@@ -1,0 +1,4 @@
+---
+tomcat_version: 8.5.32
+tomcat_download_url: https://archive.apache.org/dist/tomcat/tomcat-8/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz
+tomcat_download_dest: /tmp/apache-tomcat-{{ tomcat_version }}.tar.gz

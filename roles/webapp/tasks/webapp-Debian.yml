@@ -1,0 +1,92 @@
+- name: Ensure the system can use the HTTPS transport for APT.
+  stat:
+    path: /usr/lib/apt/methods/https
+  register: apt_https_transport
+
+- name: Install APT HTTPS transport.
+  apt:
+    name: "apt-transport-https"
+    state: present
+    update_cache: yes
+  when: not apt_https_transport.stat.exists
+
+- name: Install basic packages
+  package:
+    name: ['vim','aptitude','bash-completion','tmux','tree','htop','wget','unzip','curl','git']
+    state: present
+    update_cache: yes
+
+- name: Install Java
+  apt:
+    name: default-jdk
+    state: present
+
+- name: Add tomcat group user group
+  group:
+    name: tomcat
+
+- name: Add "tomcat" user
+  user:
+    name: tomcat
+    group: tomcat
+    home: /usr/share/tomcat
+    createhome: no
+    system: yes
+
+- name: Download Tomcat
+  get_url:
+    url: "{{ tomcat_download_url }}"
+    dest: "{{ tomcat_download_dest }}"
+
+- name: Create a tomcat directory
+  file:
+    path: /usr/share/tomcat
+    state: directory
+    owner: tomcat
+    group: tomcat
+
+- name: Extract tomcat archive
+  unarchive:
+    src: "{{ tomcat_download_dest }}"
+    dest: /usr/share/tomcat
+    owner: tomcat
+    group: tomcat
+    remote_src: yes
+    extra_opts: "--strip-components=1"
+    creates: /usr/share/tomcat/bin
+
+- name: Deploy WAR to server
+  synchronize: src=files/companyNews.war dest=/usr/share/tomcat/webapps/
+
+- name: Deploy static files to server
+  unarchive: src=files/static.zip dest=/usr/share/tomcat/webapps
+
+- name: Change file ownership, group and permissions
+  file:
+    path: /usr/share/tomcat/webapps
+    owner: root
+    group: root
+    mode: '0755'
+    recurse: yes
+
+- name: Copy self certificates to tomcat server
+  copy: src=files/certificates dest=/usr/share/tomcat/
+
+- name: Import the certificate into application's trust store
+  command: keytool -import -noprompt -trustcacerts -alias tomcat -file /usr/share/tomcat/certificates/selfsigned.cer -keystore "/usr/lib/jvm/default-java/jre/lib/security/cacerts" -storepass changeit
+
+- name: Copy tomcat server configuration for SSL support
+  copy: src=files/certificates/server.xml dest=/usr/share/tomcat/conf 
+
+- name: Start apache tomcat service
+  shell: /usr/share/tomcat/bin/startup.sh
+
+- name: wait for 30 seconds for webapp to get deployed
+  wait_for:
+    timeout: 30
+
+- name: copy static content - images to path
+  copy: remote_src=True src=/usr/share/tomcat/webapps/static/images dest=/usr/share/tomcat/webapps/companyNews
+
+- name: copy static content - styles to path
+  copy: remote_src=True src=/usr/share/tomcat/webapps/static/styles dest=/usr/share/tomcat/webapps/companyNews

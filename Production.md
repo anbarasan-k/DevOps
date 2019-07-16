@@ -30,3 +30,5 @@ The plan applied for development environment cannot be applied to production as 
 ![](images/Architecture.jpg)
 
 The static content will be delivered from S3 bucket. The HTTPS support can be implemented at Load Balancer level.
+
+- Architecture created from https://creately.com

@@ -10,7 +10,8 @@ vagrant up
 
 Access the webapp in private network: https://192.168.50.5/companyNews/
 
-Detailed steps for setting up development environment: https://github.com/anbarasan-k/DevOps/blob/master/Development.md
+Detailed steps for setting up development environment: 
+- https://github.com/anbarasan-k/DevOps/blob/master/Development.md
 
 Assumptions & Limitations:
 

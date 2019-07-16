@@ -6,7 +6,7 @@ Steps to setup environment
 git clone https://github.com/anbarasan-k/DevOps.git
 cd DevOps
 vagrant up
-``
+```
 
 Access the webapp in private network: https://192.168.50.5/companyNews/
 
